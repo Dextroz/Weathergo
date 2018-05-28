@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	g_api_key = ""
-	d_api_key = ""
+	g_api_key = "Insert Key Here."
+	d_api_key = "Insert Key Here."
 )
 
 func location_input() string {
