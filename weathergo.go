@@ -16,6 +16,11 @@ const (
 	d_api_key = "Insert Key Here."
 )
 
+func main() {
+	// Location returned from user_input() for usage in make_request()
+	dark_sky(google_request(location_input()))
+}
+
 func location_input() string {
 	// Initiating Reader object to read user input.
 	reader := bufio.NewReader(os.Stdin)
@@ -54,10 +59,8 @@ func google_request(location string) (lat, long float64) {
 func dark_sky(lat, long float64) {
 	// Exclude all other response data execept for current weather.
 	// See documentation: https://darksky.net/dev/docs#forecast-request
-	exclude_slice := []string{"minutely", "daily", "hourly", "alerts", "flags"}
-	// Create one str with "," joining each item from exclude_slice.
-	exclude_no_space := strings.Join(exclude_slice, ",")
-	ds_api_url := fmt.Sprintf("https://api.darksky.net/forecast/%v/%v,%v?exclude=%v&units=uk2", d_api_key, lat, long, exclude_no_space)
+	exclude_str := "minutely,daily,hourly,alerts,flags"
+	ds_api_url := fmt.Sprintf("https://api.darksky.net/forecast/%v/%v,%v?exclude=%v&units=uk2", d_api_key, lat, long, exclude_str)
 	// Get Request to Dark Sky API.
 	_, body, err3 := gorequest.New().Get(ds_api_url).End()
 	if err3 != nil {
@@ -81,11 +84,6 @@ func dark_sky(lat, long float64) {
 		Wind Speed - %v Mph
 
 `, summary, temperature, humidity, wind_speed)
-}
-
-func main() {
-	// Location returned from user_input() for usage in make_request()
-	dark_sky(google_request(location_input()))
 }
 
 // Struct for json resp str from Google API.
@@ -141,7 +139,7 @@ type darkskyObject struct {
 		NearestStormBearing  int     `json:"nearestStormBearing"`
 		NearestStormDistance int     `json:"nearestStormDistance"`
 		Ozone                float64 `json:"ozone"`
-		PrecipIntensity      int     `json:"precipIntensity"`
+		PrecipIntensity      float64 `json:"precipIntensity"`
 		PrecipProbability    int     `json:"precipProbability"`
 		Pressure             float64 `json:"pressure"`
 		Summary              string  `json:"summary"`
