@@ -15,15 +15,15 @@ Weathergo requires the following dependencies:
 
 To operate Weathergo you must:
 
-1.  Obtain a [Google Geocoding API key](https://developers.google.com/maps/documentation/geocoding/start?hl=en_GB).
+1.  Obtain a [Mapbox Geocoding API key](https://www.mapbox.com/signup/); create a secret key with the required scopes [see](https://www.mapbox.com/help/how-access-tokens-work/)
 
 2.  Obtain a [Dark Sky API Key](https://darksky.net/dev).
 
-3.  Place **Google Geolocation API key** and **Dark Sky API** key in the respective consts found in [weathergo.go](weathergo.go):
+3.  Place **Mapbox Geocoding API key** and **Dark Sky API** key in the respective consts found in [weathergo.go](weathergo.go):
           ```
           const (
-          	g_api_key = "Insert Key Here."
-          	d_api_key = "Insert Key Here."
+          	mapboxKey = "Insert Key Here."
+          	darkskyKey = "Insert Key Here."
           )
           ```
     ## Download Options -- Installing
