@@ -20,14 +20,16 @@ To operate Weathergo you must:
 2.  Obtain a [Dark Sky API Key](https://darksky.net/dev).
 
 3.  Place **Mapbox Geocoding API key** and **Dark Sky API** key in the respective consts found in [weathergo.go](weathergo.go):
+          
           ```
           const (
           	mapboxKey = "Insert Key Here."
           	darkskyKey = "Insert Key Here."
           )
           ```
-    ## Download Options -- Installing
-    Currently you can only clone or download the project ZIP file. (Recommended clone if you're going to be contributing.)
+
+## Download Options -- Installing
+Currently you can only clone or download the project ZIP file. (Recommended clone if you're going to be contributing.)
 
 Extract and navigate to the zipfile directory and run Weathergo by executing the main entry point file (weathergo.go):
 
