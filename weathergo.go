@@ -5,64 +5,59 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strings"
 	// 3rd Party Request Package.
 	// Link -> https://github.com/parnurzeal/gorequest
 	"github.com/parnurzeal/gorequest"
 )
 
 const (
-	g_api_key = "Insert Key Here."
-	d_api_key = "Insert Key Here."
+	mapboxKey  = "Insert Key Here."
+	darkskyKey = "Insert Key Here."
 )
 
 func main() {
-	// Location returned from user_input() for usage in make_request()
-	dark_sky(google_request(location_input()))
+	darkSky(mapboxRequest(locationInput()))
 }
 
-func location_input() string {
+func locationInput() string {
 	// Initiating Reader object to read user input.
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Location: ")
-	input, _ := reader.ReadString('\n')
-	// Replacing user input " " with + for api.
-	// -1 to replace all instances of " "
-	location := strings.Replace(input, " ", "+", -1)
-	// Return var location for use in google_request function.
+	location, _ := reader.ReadString('\n')
+	// Return var location for use in mapboxRequest function.
 	return location
 }
 
-// google_request func takes input location and returns two float64 vars.
-func google_request(location string) (lat, long float64) {
-	g_api_url := fmt.Sprintf("https://maps.googleapis.com/maps/api/geocode/json?address=%v&key=%v", location, g_api_key)
-	// Get Request to Google API.
-	_, body, err := gorequest.New().Get(g_api_url).End()
+// mapboxRequest func takes input location and returns two float64 vars.
+func mapboxRequest(location string) (lat, long float64) {
+	mapboxURL := fmt.Sprintf("https://api.mapbox.com/geocoding/v5/mapbox.places/%v.json?access_token=%v", location, mapboxKey)
+	// Get Request to Mapbox API.
+	_, body, err := gorequest.New().Get(mapboxURL).End()
 	if err != nil {
-		fmt.Println("Failed to contract Google API: ", err)
+		fmt.Println("Failed to contact Mapbox API: ", err)
 	}
 	var Location locationObject
-	// Create struct and place into variable Weather.
+	// Create struct and place into variable Location.
 	err2 := json.Unmarshal([]byte(body), &Location)
 	if err2 != nil {
 		fmt.Println("Error: ", err2)
 	} else {
-		// Obtain lat, long from Weather struct stored in Weather var.
-		lat := Location.Results[0].Geometry.Location.Lat
-		long := Location.Results[0].Geometry.Location.Lng
+		// Obtain lat, long from Location struct stored in Location var.
+		lat := Location.Features[0].Center[1]
+		long := Location.Features[0].Center[0]
 		return lat, long
 	}
 	return
 }
 
-// dark_sky func takes two parameters. Lat and long passed in from google_request.
-func dark_sky(lat, long float64) {
+// darkSky func takes two parameters. Lat and long passed in from mapboxRequest.
+func darkSky(lat, long float64) {
 	// Exclude all other response data execept for current weather.
 	// See documentation: https://darksky.net/dev/docs#forecast-request
-	exclude_str := "minutely,daily,hourly,alerts,flags"
-	ds_api_url := fmt.Sprintf("https://api.darksky.net/forecast/%v/%v,%v?exclude=%v&units=uk2", d_api_key, lat, long, exclude_str)
+	excludeStr := "minutely,daily,hourly,alerts,flags"
+	darkSkyURL := fmt.Sprintf("https://api.darksky.net/forecast/%v/%v,%v?exclude=%v&units=uk2", darkskyKey, lat, long, excludeStr)
 	// Get Request to Dark Sky API.
-	_, body, err3 := gorequest.New().Get(ds_api_url).End()
+	_, body, err3 := gorequest.New().Get(darkSkyURL).End()
 	if err3 != nil {
 		fmt.Println("Request Failed to Dark Sky API: ", err3)
 	}
@@ -72,60 +67,50 @@ func dark_sky(lat, long float64) {
 	if err4 != nil {
 		fmt.Println("Error", err4)
 	}
-	// Obtain specific data from Weather struct and store in seperate vars.
+	// Obtain specific data from darksky struct and store in seperate vars.
 	summary := Darksky.Currently.Summary
 	temperature := Darksky.Currently.Temperature
 	humidity := Darksky.Currently.Humidity
-	wind_speed := Darksky.Currently.WindSpeed
+	windspeed := Darksky.Currently.WindSpeed
 	fmt.Printf(`
-		Current Weather - %v
-		Temperature - %v°C
-		Humidity - %v
-		Wind Speed - %v Mph
+Current Weather - %v
+Temperature - %v°C
+Humidity - %v
+Wind Speed - %v Mph
 
-`, summary, temperature, humidity, wind_speed)
+Powered By Dark Sky: https://darksky.net/poweredby/
+
+`, summary, temperature, humidity, windspeed)
 }
 
-// Struct for json resp str from Google API.
+// Struct for json resp str from Mapbox API.
 type locationObject struct {
-	Results []struct {
-		AddressComponents []struct {
-			LongName  string   `json:"long_name"`
-			ShortName string   `json:"short_name"`
-			Types     []string `json:"types"`
-		} `json:"address_components"`
-		FormattedAddress string `json:"formatted_address"`
-		Geometry         struct {
-			Bounds struct {
-				Northeast struct {
-					Lat float64 `json:"lat"`
-					Lng float64 `json:"lng"`
-				} `json:"northeast"`
-				Southwest struct {
-					Lat float64 `json:"lat"`
-					Lng float64 `json:"lng"`
-				} `json:"southwest"`
-			} `json:"bounds"`
-			Location struct {
-				Lat float64 `json:"lat"`
-				Lng float64 `json:"lng"`
-			} `json:"location"`
-			LocationType string `json:"location_type"`
-			Viewport     struct {
-				Northeast struct {
-					Lat float64 `json:"lat"`
-					Lng float64 `json:"lng"`
-				} `json:"northeast"`
-				Southwest struct {
-					Lat float64 `json:"lat"`
-					Lng float64 `json:"lng"`
-				} `json:"southwest"`
-			} `json:"viewport"`
+	Type     string   `json:"type"`
+	Query    []string `json:"query"`
+	Features []struct {
+		ID         string   `json:"id"`
+		Type       string   `json:"type"`
+		PlaceType  []string `json:"place_type"`
+		Relevance  float64  `json:"relevance"`
+		Properties struct {
+			Wikidata string `json:"wikidata"`
+		} `json:"properties"`
+		Text      string    `json:"text"`
+		PlaceName string    `json:"place_name"`
+		Bbox      []float64 `json:"bbox,omitempty"`
+		Center    []float64 `json:"center"`
+		Geometry  struct {
+			Type        string    `json:"type"`
+			Coordinates []float64 `json:"coordinates"`
 		} `json:"geometry"`
-		PlaceID string   `json:"place_id"`
-		Types   []string `json:"types"`
-	} `json:"results"`
-	Status string `json:"status"`
+		Context []struct {
+			ID        string `json:"id"`
+			ShortCode string `json:"short_code"`
+			Wikidata  string `json:"wikidata"`
+			Text      string `json:"text"`
+		} `json:"context"`
+	} `json:"features"`
+	Attribution string `json:"attribution"`
 }
 
 // Struct for json resp str from Dark Sky API.
