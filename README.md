@@ -37,7 +37,7 @@ Extract and navigate to the zipfile directory and run Weathergo by executing the
 
 ## Authors -- Contributors
 
--   **Daniel Brennand** - _Author_ - [Dextroz](https://github.com/Dextroz)
+-   **Dextroz** - _Author_ - [Dextroz](https://github.com/Dextroz)
 
 ## License
 
