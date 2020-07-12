@@ -1,6 +1,6 @@
 # Weathergo
 
-A clone of my project WeatherTerm; written in Go (<https://github.com/Dextroz/WeatherTerm>)
+A clone of my project WeatherTerm; written in Go (<https://github.com/dbrennand/WeatherTerm>)
 
 ## Dependencies
 
@@ -37,7 +37,7 @@ Extract and navigate to the zipfile directory and run Weathergo by executing the
 
 ## Authors -- Contributors
 
--   **Dextroz** - _Author_ - [Dextroz](https://github.com/Dextroz)
+-   **dbrennand** - _Author_ - [dbrennand](https://github.com/dbrennand)
 
 ## License
 
